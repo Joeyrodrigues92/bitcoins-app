@@ -7,36 +7,13 @@ import {
   TouchableOpacity,
   View,
   Image,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 import Coin from '../components/Coin';
-
 import { MonoText } from '../components/StyledText';
-
-
-//DUMMY DATA
-
-const coins = [{
-  "id": 1,
-  "name": "Bitcoin",
-  "symbol": "BTC",
-  "price": "$ 1,012.49",
-  "imageUrl":"https://www.cryptocompare.com/media/19633/btc.png"
-},
-{
-  "id": 2,
-  "name": "Ethereum",
-  "symbol": "ETH",
-  "price": "$ 186.49",
-  "imageUrl":"https://www.cryptocompare.com/media/20646/eth_logo.png",
-},
-{
-  "id": 3,
-  "name": "Litecoin",
-  "symbol": "LTC",
-  "price": "$ 72.52",
-  "imageUrl": "https://www.cryptocompare.com/media/35309662/ltc.png"
-}];
+import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 
 
 // FlatList - ideal for rendering long lists of data
@@ -45,15 +22,44 @@ const coins = [{
 //    Index support
 //    Immutable data source
 
+const BITCOINS_QUERY = gql`
+  query Bitcoins($offset: Int, $limit: Int) {
+    bitcoins(offset: $offset, limit: $limit) {
+      name
+      imageUrl
+      symbol
+      price
+    }
+  }
+`;
+
 export default function HomeScreen(props) {
   // ONpress method will handle Navigation
   const { navigation } = props;
+
+  const { data, fetchMore, error } = useQuery(BITCOINS_QUERY, {
+    // Hard coding arugument data to be used as arguments for our graphql Query
+    variables:{
+      offset: 0,
+      limit: 10,
+    },
+    fetchPolicy:'cache-and-network'
+ //    FETCH POLICY is an option which allows you to specify how you want your component to interact with the Apollo data cache.   
+//      -This fetch policy will have Apollo first trying to read data from your cache.
+//      -If all the data needed to fulfill your query is in the cache then that data will be returned
+  });
+
+  if(!data || !data.bitcoins || error){
+    console.log(error)
+    return <ActivityIndicator styel={{ ...StyleSheet.absoluteFillObject }} />
+  }
+  
   return (
     <View style={styles.container}>
       <FlatList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
-        data={coins}
+        data={data.bitcoins}
         // KeyExtractor expects a str returned
         keyExtractor={(item, index) => {
           return `${index}`;
