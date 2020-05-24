@@ -66,10 +66,37 @@ export default function HomeScreen(props) {
         }}     
         renderItem={(coin, index) => {
           const {item} = coin;
-{/*         Every time we press on coin we navigate to Detail screen, and pass coin as a param({ coin: item }) */}
-            return <Coin coin={item} onPress={() => navigation.navigate('Detail', {coin: item})} />   
-          } 
-        } 
+          // Every time we press on coin we navigate to Detail screen, and pass coin as a param({ coin: item }) 
+            return <Coin 
+            coin={item} 
+            onPress={() => navigation.navigate('Detail', {coin: item})} />   
+        }}
+        //this will, determin how was user can scroll, till we fetch more coins
+        onEndReachedThreshold={0.9}
+          // Render more coins as user scrolls
+        onEndReached={() => {
+          // fetchMore, a hook responsible for fetching the next page of coins
+          fetchMore({
+            variables:{
+              // current list of bitcoins
+              offset: data.bitcoins.length
+            },
+            // prev - previous state of data
+            updateQuery: (prev, { fetchMoreResult }) => {
+              if (!fetchMoreResult) return prev;
+
+            //   {}, is our target, the obj we will modify
+            //  other arguments, are our source, which has the data to modify our target
+
+            // we assign the previous state
+            // and concatenate our previous state of coins with the new coins we just fetched
+          
+              return Object.assign({}, prev, {
+                bitcoins: [...prev.bitcoins, ...fetchMoreResult.bitcoins]
+              })
+            }
+          })
+        }}
       />
     </View>
   );
