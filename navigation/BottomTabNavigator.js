@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
+import FavoriteScreen from '../screens/FavoriteScreen';
 import LinksScreen from '../screens/LinksScreen';
 
 const BottomTab = createBottomTabNavigator();
@@ -26,9 +27,9 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
       <BottomTab.Screen
         name="Links"
-        component={LinksScreen}
+        component={FavoriteScreen}
         options={{
-          title: 'Resources',
+          title: 'Favorites',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
         }}
       />
@@ -43,6 +44,6 @@ function getHeaderTitle(route) {
     case 'Home':
       return 'Bitcoins';
     case 'Links':
-      return 'Links to learn more';
+      return 'Favorite Bitcoin';
   }
 }
